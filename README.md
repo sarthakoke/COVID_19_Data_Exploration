@@ -75,11 +75,12 @@ The ultimate goal is to prepare the cleaned and transformed data for visualizati
 
 A dynamic Tableau dashboard was created to visualize the insights derived from SQL analysis.
 
-### 🔗 [View Interactive Dashboard](#) *(insert live Tableau link here)*
+### 🔗 [View Interactive Dashboard](#) *(https://public.tableau.com/app/profile/sarthak.oke/viz/COVID-19Dashboard_17120260468050/Dashboard1)*
 
 ### Dashboard Preview:
 
-![COVID-19 Dashboard](assets/covid-dashboard-preview.png)
+![image](https://github.com/user-attachments/assets/0dd49c9a-de04-4616-9fd7-e5e531e84fa1)
+
 
 **Included Visuals**:
 - Global summary table (cases, deaths, death %)
