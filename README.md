@@ -145,8 +145,5 @@ FROM PopvsVac;
 
 - [Our World In Data – COVID-19 Datasets](https://ourworldindata.org/coronavirus)
 - [SQL Server Documentation](https://learn.microsoft.com/en-us/sql/)
-- Google Data Analytics Certification Capstone
 
 ---
-
-> 💼 *This project is part of my portfolio for the Google Data Analytics Certification Capstone*
