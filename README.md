@@ -3,7 +3,7 @@
 
 ## 📌 Overview
 
-This project is a comprehensive data exploration and analysis of the global COVID-19 pandemic. Using publicly available datasets on COVID-19 deaths and vaccinations, this analysis uncovers insights about infection rates, vaccination trends, and mortality statistics. The project demonstrates proficiency in SQL through advanced querying techniques and prepares datasets for visualizations in Tableau.
+This project presents an in-depth analysis of the COVID-19 pandemic using real-world data from global sources. It combines **data cleaning, SQL-based exploration, and visualization in Tableau** to derive key insights on infection trends, vaccination progress, and mortality rates across countries and continents.
 
 > 💾 Tools Used: Microsoft Excel, SQL Server Management Studio (SSMS), Tableau
 
@@ -11,39 +11,36 @@ This project is a comprehensive data exploration and analysis of the global COVI
 
 ## 🎯 Objective
 
-Analyze the impact of COVID-19 across countries and continents by exploring key indicators such as:
-- Total cases and deaths
-- Infection and death rates per population
-- Vaccination progress across the globe
-
+To uncover insights from the COVID-19 datasets using SQL queries and translate those findings into powerful visualizations. This includes:
+- Understanding total cases, deaths, and infection rates
+- Calculating death percentages and affected population shares
+- Analyzing vaccination rollout across locations and time
+- Preparing and structuring data for dynamic Tableau visualizations
 The ultimate goal is to prepare the cleaned and transformed data for visualization and provide actionable insights.
-
 ---
 
 ## 📁 Files Included
 
 - `CovidDeaths.xlsx` – Dataset containing global COVID-19 death records
 - `CovidVaccinations.xlsx` – Dataset containing global vaccination data
-- `Data Exploration.sql` – SQL script for cleaning and exploratory analysis
-- `Query For Tableau Visualization.sql` – SQL queries optimized for Tableau visualizations
+- `Data Exploration.sql` – SQL script with optimized queries and calculations
+- `Query For Tableau Visualization.sql` – SQL queries tailored for Tableau input
 
 ---
 
-## 🧹 Data Preparation
+## 🧹 Data Preparation and Processing
 
-1. **Excel Cleaning**:
-   - Removed nulls, inconsistent formatting, and unnecessary columns.
-   - Ensured date formats were consistent across files.
+1. **Initial Cleaning in Excel**:
+   - Verified structure and removed unnecessary columns
+   - Standardized date formats and null value handling
 
-2. **SQL Transformation**:
-   - Imported cleaned Excel files into SQL Server.
-   - Removed entries with `null` continent values.
-   - Filtered data to include only realistic values (e.g., population > 0, valid numeric conversions).
-   - Calculated new metrics like:
-     - Death Percentage
-     - Infection Percentage
-     - Rolling Vaccination Totals
-     - Population Vaccination Rates
+2. **SQL Transformation & Analysis**:
+   - Imported both Excel files into SQL Server
+   - Used **window functions**, **CTEs**, **views**, and **temp tables**
+   - Created fields such as:
+     - `DeathPercentage = (total_deaths / total_cases) * 100`
+     - `AffectedPopulation = (total_cases / population) * 100`
+     - `PercentagePopulationVaccinated` using rolling SUM() window logic
 
 ---
 
@@ -61,90 +58,88 @@ The ultimate goal is to prepare the cleaned and transformed data for visualizati
 
 ## 🔍 Key Insights
 
-- **Global Stats**: ~775M total cases and 7M+ deaths, resulting in ~0.91% global death rate.
-- **Continent Analysis**: Europe recorded the highest total deaths, followed by South America and Asia.
-- **Country Trends**:
-  - Highest infected %: Australia (44.52%), UK (36.75%), US (30.88%)
-  - Lowest infected %: India (1.8%), China (6.5%)
-- **Vaccination Progress**:
-  - Rolling vaccinations analyzed over time using window functions and CTEs.
+- 🌍 **Global Totals**:  
+  - **Total Cases**: 774M+  
+  - **Total Deaths**: 7M+  
+  - **Death Rate**: ~0.91%
+
+- 📊 **Highest Deaths by Continent**: Europe, South America, Asia
+
+- 💉 **Vaccination Trends**:
+  - Used advanced SQL window functions to calculate cumulative vaccinations by date
+  - Created a rolling view of `% of population vaccinated`
+
+- 🔎 **Infection Insights**:
+  - Australia (44.52%) showed the highest percentage of infected population
+  - India (1.8%) and China (6.5%) remained among the lowest
 
 ---
 
 ## 📊 Tableau Dashboard
 
-A dynamic Tableau dashboard was created to visualize the insights derived from SQL analysis.
+📌 [Interactive Dashboard Link](https://public.tableau.com/app/profile/sarthak.oke/viz/COVID-19Dashboard_17120260468050/Dashboard1)
 
-### 🔗 [View Interactive Dashboard](https://public.tableau.com/app/profile/sarthak.oke/viz/COVID-19Dashboard_17120260468050/Dashboard1)
-
-### Dashboard Preview:
+### Dashboard Highlights:
+- Total global cases, deaths, and death rate
+- Bar chart of deaths by continent
+- Choropleth map showing infected population % by country
+- Line chart showing infection rate trends by major countries
 
 ![image](https://github.com/user-attachments/assets/0dd49c9a-de04-4616-9fd7-e5e531e84fa1)
 
+---
 
-**Included Visuals**:
-- Global summary table (cases, deaths, death %)
-- Bar chart of deaths by continent
-- World map showing infection % per country
-- Time-series line chart of infection rate trends by country
+## 🛠️ Technologies and Skills Used
+
+- **Microsoft Excel** – Initial data preparation
+- **SQL Server Management Studio (SSMS)** – Complex querying and transformation
+- **SQL Features**:
+  - Joins, Window Functions, Temp Tables, Views, CTEs, Type Conversion
+- **Tableau** – Data visualization and storyboarding
 
 ---
 
-## 🚀 How to Use This Project
-
-1. **Install Requirements**:
-   - Microsoft SQL Server Management Studio (SSMS)
-   - Microsoft Excel or Google Sheets
-
-2. **Steps**:
-   - Download and clean the two `.xlsx` datasets.
-   - Import the cleaned data into SQL Server.
-   - Run the queries from `Data Exploration.sql` for insight extraction.
-   - Use `Query For Tableau Visualization.sql` to prep for visualization.
-   - Optional: Import data into Tableau for advanced visualization.
-
----
-
-## 🧾 Example SQL Logic
+## 🧾 Example SQL Snippets
 
 ```sql
--- % Population Infected
-SELECT Location, date, Population, total_cases, 
-       (total_cases / Population) * 100 AS PercentPopulationInfected
+-- Global death percentage
+SELECT SUM(new_cases) AS TotalCases,
+       SUM(new_deaths) AS TotalDeaths,
+       SUM(new_deaths)*100.0/SUM(new_cases) AS DeathPercentage
 FROM PortfolioProject..CovidDeaths
-WHERE continent IS NOT NULL
-ORDER BY 1,2;
+WHERE continent IS NOT NULL;
 ```
 
 ```sql
--- Vaccination CTE
-WITH PopvsVac AS (
-  SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
-         SUM(CONVERT(int, vac.new_vaccinations)) OVER (
-           PARTITION BY dea.Location ORDER BY dea.date
-         ) AS RollingPeopleVaccinated
-  FROM PortfolioProject..CovidDeaths dea
-  JOIN PortfolioProject..CovidVaccinations vac
-    ON dea.location = vac.location AND dea.date = vac.date
-  WHERE dea.continent IS NOT NULL
+-- Cumulative vaccinations by country
+WITH PopvsVacc AS (
+  SELECT death.continent, death.location, death.date, death.population,
+         vacc.new_vaccinations,
+         SUM(CONVERT(bigint, vacc.new_vaccinations)) OVER (
+           PARTITION BY death.location ORDER BY death.date
+         ) AS TotalVaccinationCount
+  FROM PortfolioProject..CovidDeaths death
+  JOIN PortfolioProject..CovidVaccinations vacc
+    ON death.location = vacc.location AND death.date = vacc.date
+  WHERE death.continent IS NOT NULL
 )
-SELECT *, (RollingPeopleVaccinated / population) * 100 AS PercentVaccinated
-FROM PopvsVac;
+SELECT *, (TotalVaccinationCount/population)*100 AS PercentagePopulationVaccinated
+FROM PopvsVacc;
 ```
 
 ---
 
 ## 🚧 Limitations
 
-- Data depends on accuracy of reporting countries
-- Not all locations report vaccinations or deaths equally
-- Datasets may have missing or delayed entries
+- Real-world data may be inconsistently reported by countries
+- Missing values and reporting delays in certain regions
+- No demographic segmentation (e.g., age, gender)
 
 ---
 
 ## 📎 References
 
-- [Our World In Data – COVID-19 Datasets](https://ourworldindata.org/coronavirus)
-- [SQL Server Documentation](https://learn.microsoft.com/en-us/sql/)
+- [Our World In Data – COVID-19 Dataset](https://ourworldindata.org/coronavirus)
+- [Microsoft SQL Server Docs](https://learn.microsoft.com/en-us/sql/)
 
 ---
